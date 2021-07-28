@@ -140,6 +140,12 @@ scene.add(camera)
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
+controls.enablePan = false
+controls.minDistance = 5
+controls.maxDistance = 7
+
+gui.add(controls, 'minDistance').min(0).max(2000).step(0.001).name("minZoom")
+gui.add(controls, 'maxDistance').min(0).max(2000).step(0.001).name("maxZoom")
 
 /**
  * Renderer
@@ -156,7 +162,6 @@ renderer.toneMapping = THREE.ReinhardToneMapping
 renderer.toneMappingExposure = 1.5
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
 
 /**
  * Post Processing 
@@ -200,6 +205,9 @@ const dotScreenPass = new DotScreenPass()
 dotScreenPass.enabled = false
 effectComposer.addPass(dotScreenPass)
 
+const dotScreenFolder = gui.addFolder('DotScreenPass')
+dotScreenFolder.add(dotScreenPass, 'enabled')
+
 //glitchPass
 const glitchPass = new GlitchPass()
 glitchPass.enabled = false
@@ -213,21 +221,20 @@ effectComposer.addPass(rgbShiftPass)
 //unrealbloompass
 const unrealBloomPass = new UnrealBloomPass()
 effectComposer.addPass(unrealBloomPass)
-
 unrealBloomPass.strength = 0.2
 unrealBloomPass.radius = 1
 unrealBloomPass.threshold = 0.6
 unrealBloomPass.enabled = false
 
-gui.add(unrealBloomPass, 'enabled')
-gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
-gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
-gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001)
+const unrealBloomFolder = gui.addFolder('UnrealBloomPass')
+unrealBloomFolder.add(unrealBloomPass, 'enabled')
+unrealBloomFolder.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
+unrealBloomFolder.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
+unrealBloomFolder.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001)
 
 /**
  * custom passes
  */
-
 //tint pass
 const TintShader = {
     uniforms : { 
@@ -242,9 +249,11 @@ tintPass.material.uniforms.uTint.value = new THREE.Vector3()
 tintPass.enabled = false
 effectComposer.addPass(tintPass)
 
-// gui.add(tintPass.material.uniforms.uTint.value, 'x').min(0).max(1).step(0.001).name("Tint red color")
-// gui.add(tintPass.material.uniforms.uTint.value, 'y').min(0).max(1).step(0.001).name("Tint green color")
-// gui.add(tintPass.material.uniforms.uTint.value, 'z').min(0).max(1).step(0.001).name("Tint blue color")
+const tintPassFolder = gui.addFolder('TintPass')
+tintPassFolder.add(tintPass, 'enabled')
+tintPassFolder.add(tintPass.material.uniforms.uTint.value, 'x').min(0).max(1).step(0.001).name("Tint red color")
+tintPassFolder.add(tintPass.material.uniforms.uTint.value, 'y').min(0).max(1).step(0.001).name("Tint green color")
+tintPassFolder.add(tintPass.material.uniforms.uTint.value, 'z').min(0).max(1).step(0.001).name("Tint blue color")
 
 //displacement pass
 const DisplacementShader = {
@@ -259,6 +268,9 @@ const displacementPass = new ShaderPass(DisplacementShader)
 displacementPass.material.uniforms.uNormalMap.value = textureLoader.load('textures/interfaceNormalMap.png')
 effectComposer.addPass(displacementPass)
 
+const displacementPassFolder = gui.addFolder("Alien's viewport effect")
+displacementPassFolder.add(displacementPass, 'enabled')
+
 //bloom pass
 const bloomPass = new BloomPass(   
     1,    // strength
@@ -268,7 +280,10 @@ const bloomPass = new BloomPass(
 )
 bloomPass.enabled = false
 effectComposer.addPass(bloomPass)
-gui.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
+
+const bloomPassFolder = gui.addFolder('BloomPass')
+bloomPassFolder.add(bloomPass, 'enabled')
+bloomPassFolder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
 
 //filmpass
 const filmPass = new FilmPass(
@@ -281,16 +296,16 @@ filmPass.renderToScreen = true;
 filmPass.enabled = false
 effectComposer.addPass(filmPass);
 
+const filmPassFolder = gui.addFolder('filmPass')
+filmPassFolder.add(filmPass, 'enabled')
+
 //smaa pass
 if(renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2 ){
     const smaaPass = new SMAAPass()
     smaaPass.enabled = true
     effectComposer.addPass(smaaPass)
-
     console.log("Using WebGLRenderTarget and SMAAPass");
 }
-
-// const 
 
 /**
  * Animate
