@@ -211,12 +211,21 @@ dotScreenFolder.add(dotScreenPass, 'enabled')
 //glitchPass
 const glitchPass = new GlitchPass()
 glitchPass.enabled = false
+glitchPass.goWild = false
 effectComposer.addPass(glitchPass)
+
+const glitchPassFolder = gui.addFolder('Glitch Effect')
+glitchPassFolder.add(glitchPass, 'enabled')
+glitchPassFolder.add(glitchPass,'goWild')
+
 
 //rgbshiftpass
 const rgbShiftPass = new ShaderPass(RGBShiftShader)
 rgbShiftPass.enabled = false
 effectComposer.addPass(rgbShiftPass)
+
+const rgbShiftPassFolder = gui.addFolder('RGB shift Effect')
+rgbShiftPassFolder.add(rgbShiftPass, 'enabled')
 
 //unrealbloompass
 const unrealBloomPass = new UnrealBloomPass()
