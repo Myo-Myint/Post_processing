@@ -42,8 +42,7 @@ const scene = new THREE.Scene()
 //grab dom elements
 const loadingBar =  document.querySelector('.loading-bar')
 const loadingBalls = document.querySelector('.wrapper')
-
-console.log(window.getComputedStyle(loadingBalls).getPropertyValue("opacity"));
+// console.log(window.getComputedStyle(loadingBalls).getPropertyValue("opacity"));
 const loadingManager = new THREE.LoadingManager(
     ()=>{
         setTimeout(()=>{
@@ -87,7 +86,7 @@ const textureLoader = new THREE.TextureLoader(loadingManager)
          uniform float uAlpha;
          
          void main(){
-             gl_FragColor = vec4(0.15, 0.15, 0.15, uAlpha);
+             gl_FragColor = vec4(0.25, 0.25, 0.25, uAlpha);
          }
      `
  })
