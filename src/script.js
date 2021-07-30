@@ -20,7 +20,8 @@ import displacementPassVertexShader from './shaders/displacementPass/vertex.glsl
 import displacementPassFragmentShader from './shaders/displacementPass/fragment.glsl' 
 
 import * as dat from 'dat.gui'
-
+import {gsap} from 'gsap'
+// import CSSPlugin from 'gsap/CSSPlugin';
 
 /**
  * Base
@@ -38,10 +39,62 @@ const scene = new THREE.Scene()
 /**
  * Loaders
  */
-const gltfLoader = new GLTFLoader()
-const cubeTextureLoader = new THREE.CubeTextureLoader()
-const textureLoader = new THREE.TextureLoader()
+//grab dom elements
+const loadingBar =  document.querySelector('.loading-bar')
+const loadingBalls = document.querySelector('.wrapper')
 
+console.log(window.getComputedStyle(loadingBalls).getPropertyValue("opacity"));
+const loadingManager = new THREE.LoadingManager(
+    ()=>{
+        setTimeout(()=>{
+            displacementPass.enabled = true
+            gsap.to(overlayMaterial.uniforms.uAlpha,{duration: 3, value: 0})
+            loadingBar.classList.add('ended')
+            loadingBar.style.transform = ``
+
+            gsap.to('.wrapper',{ duration: 2, autoAlpha: 0} )
+        },500)
+
+    },
+    (url, itemsLoaded, itemsTotal)=>{
+        let loadingRate = itemsLoaded / itemsTotal
+        loadingBar.style.transform = `scaleX(${loadingRate})`
+    }
+)
+const gltfLoader = new GLTFLoader(loadingManager)
+const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager)
+const textureLoader = new THREE.TextureLoader(loadingManager)
+
+/**
+ * Overlay mesh
+ */
+ const overlayGeography = new THREE.PlaneBufferGeometry(2, 2, 1, 1)
+ const overlayMaterial = new THREE.ShaderMaterial({
+     transparent : true,
+     uniforms: {
+         uAlpha: { value : 1.0 }
+     },
+     vertexShader: `
+         void main(){
+             //position
+             gl_Position = vec4(position, 1.0);
+
+             //color
+
+         }
+     `,
+     fragmentShader:`
+         uniform float uAlpha;
+         
+         void main(){
+             gl_FragColor = vec4(0.15, 0.15, 0.15, uAlpha);
+         }
+     `
+ })
+ const overlayPlane = new THREE.Mesh(overlayGeography, overlayMaterial)
+ scene.add(overlayPlane) 
+ 
+ 
 /**
  * Update all materials
  */
@@ -275,6 +328,7 @@ const DisplacementShader = {
 }
 const displacementPass = new ShaderPass(DisplacementShader)
 displacementPass.material.uniforms.uNormalMap.value = textureLoader.load('textures/interfaceNormalMap.png')
+displacementPass.enabled = false
 effectComposer.addPass(displacementPass)
 
 const displacementPassFolder = gui.addFolder("Alien's viewport effect")
