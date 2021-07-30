@@ -46,12 +46,13 @@ const loadingBalls = document.querySelector('.wrapper')
 const loadingManager = new THREE.LoadingManager(
     ()=>{
         setTimeout(()=>{
+            glitchPass.enabled = false
             displacementPass.enabled = true
             gsap.to(overlayMaterial.uniforms.uAlpha,{duration: 3, value: 0})
             loadingBar.classList.add('ended')
             loadingBar.style.transform = ``
 
-            gsap.to('.wrapper',{ duration: 2, autoAlpha: 0} )
+            gsap.to('.wrapper',{ duration: 1, autoAlpha: 0} )
         },500)
 
     },
